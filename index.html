@@ -128,6 +128,42 @@
     </div>
 
 
+    <svg id="counterSvg" xmlns="http://www.w3.org/2000/svg" width="140" height="20">
+        <linearGradient id="b" x2="0" y2="100%">
+            <stop offset="0" stop-color="#ddd" stop-opacity=".1"/>
+            <stop offset="1" stop-opacity=".1"/>
+        </linearGradient>
+        <mask id="a">
+            <rect width="140" height="20" rx="3" fill="#fff"/>
+        </mask>
+        <g mask="url(#a)">
+            <rect width="90" height="20" fill="#4CAF50"/>
+            <rect x="90" width="50" height="20" fill="#1976D2"/>
+            <rect width="140" height="20" fill="url(#b)"/>
+        </g>
+        <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+            <text x="45" y="14">Page Views</text>
+            <text id="viewCount" x="115" y="14">0</text>
+        </g>
+    </svg>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const viewCount = document.getElementById("viewCount");
+
+            // Retrieve the current count from localStorage or initialize to 0
+            let count = parseInt(localStorage.getItem("pageViewCount")) || 0;
+
+            // Increment the count
+            count++;
+
+            // Update the SVG text with the new count
+            viewCount.textContent = count.toLocaleString(); // Format with commas
+
+            // Save the new count to localStorage
+            localStorage.setItem("pageViewCount", count);
+        });
+    </script>
     <script src="script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -1,16 +1,18 @@
+// Purpose: Backend server for the Student Management System. This server will handle the student registration form data and store it in a MongoDB database. The frontend will interact with this server to add new students and fetch the list of students.
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
+require('dotenv').config();
 const app = express();
-const PORT = 5000;
-
+const PORT = process.env.PORT || 5000;
+const mongoURI = process.env.MONGO_URI;
 // Middleware
 app.use(cors());
+app.use(cors({ origin: 'https://shiva0909122.github.io' })); // Allow requests only from your frontend
 app.use(express.json());
 
 // MongoDB Atlas connection
-mongoose.connect('mongodb+srv://shivarthdrona:Academic1234@students.3rfbz.mongodb.net/', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB Atlas'))
     .catch(err => console.error(err));
 
@@ -33,17 +35,30 @@ const studentSchema = new mongoose.Schema({
 });
 
 const Student = mongoose.model('Student', studentSchema);
+let students = []; // Temporary in-memory storage for demo purposes
+
+// Add a new student
+app.post('/students', (req, res) => {
+    const newStudent = req.body;
+    if (!newStudent.name || !newStudent.roll) {
+        return res.status(400).send({ error: 'Name and Roll number are required' });
+    }
+    students.push(newStudent);
+    console.log('Student added:', newStudent);
+    res.status(201).send({ message: 'Student added successfully' });
+});
+
 
 // Routes
-app.post('/students', async (req, res) => {
-    try {
-        const student = new Student(req.body);
-        await student.save();
-        res.status(201).json(student);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
-});
+// app.post('/students', async (req, res) => {
+//     try {
+//         const student = new Student(req.body);
+//         await student.save();
+//         res.status(201).json(student);
+//     } catch (err) {
+//         res.status(400).json({ error: err.message });
+//     }
+// });
 
 app.get('/students', async (req, res) => {
     try {

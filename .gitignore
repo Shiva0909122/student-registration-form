@@ -62,3 +62,4 @@ logs/
 *.tmp
 *.lock
 *.gz
+.vercel

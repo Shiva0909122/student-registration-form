@@ -60,64 +60,67 @@ startDateInput.addEventListener("change", calculateDuration);
 endDateInput.addEventListener("change", calculateDuration);
 
 // ========== adding the student details to the database ======================== //
-const backendUrl = 'http://localhost:5000'; // Update with your backend's actual URL
+// const backendUrl = 'http://localhost:5000'; // Update with your backend's actual URL
+// Replace with your deployed backend's actual URL
+const backendUrl = 'https://student-registration-form-1.onrender.com'; // Backend URL
 
-    async function addStudent() {
-        // Gather form data
-        const studentData = {
-            name: document.getElementById('name').value,
-            mobile: document.getElementById('mobile').value,
-            parentMobile: document.getElementById('parent-mobile').value,
-            email: document.getElementById('email').value,
-            college: document.getElementById('address').value,
-            course: document.getElementById('course').value,
-            startDate: document.getElementById('start-date').value,
-            endDate: document.getElementById('end-date').value,
-            duration: document.getElementById('duration').value,
-            year: document.getElementById('year').value,
-            department: document.getElementById('department').value,
-            serial: document.getElementById('serial').value,
-            roll: document.getElementById('roll').value,
-            certification: document.getElementById('certification').value,
-        };
+async function addStudent() {
+    const studentData = {
+        name: document.getElementById('name').value.trim(),
+        mobile: document.getElementById('mobile').value.trim(),
+        parentMobile: document.getElementById('parent-mobile').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        college: document.getElementById('address').value.trim(),
+        course: document.getElementById('course').value.trim(),
+        startDate: document.getElementById('start-date').value.trim(),
+        endDate: document.getElementById('end-date').value.trim(),
+        duration: document.getElementById('duration').value.trim(),
+        year: document.getElementById('year').value.trim(),
+        department: document.getElementById('department').value.trim(),
+        serial: document.getElementById('serial').value.trim(),
+        roll: document.getElementById('roll').value.trim(),
+        certification: document.getElementById('certification').value.trim(),
+    };
 
-        try {
-            // Send data to the backend
-            const response = await fetch(`${backendUrl}/students`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(studentData),
-            });
+    try {
+        const response = await fetch(`${backendUrl}/students`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(studentData),
+        });
 
-            if (!response.ok) throw new Error('Failed to add student');
-
-            // Refresh the student list
-            fetchStudents();
-        } catch (err) {
-            console.error(err.message);
-            alert('Error adding student');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to add student');
         }
+
+        alert('Student added successfully!');
+        fetchStudents(); // Refresh the student list
+    } catch (err) {
+        console.error(err.message);
+        alert(`Error adding student: ${err.message}`);
     }
+}
 
-    async function fetchStudents() {
-        try {
-            const response = await fetch(`${backendUrl}/students`);
-            const students = await response.json();
+async function fetchStudents() {
+    try {
+        const response = await fetch(`${backendUrl}/students`);
+        if (!response.ok) throw new Error('Failed to fetch students');
 
-            // Update the student list
-            const studentList = document.getElementById('student');
-            studentList.innerHTML = ''; // Clear the list
+        const students = await response.json();
+        const studentList = document.getElementById('student');
+        studentList.innerHTML = ''; // Clear the list
 
-            students.forEach(student => {
-                const li = document.createElement('li');
-                li.textContent = `1.Name -> ${student.name} 2.Course -> ${student.course} 3.Roll No. -> ${student.roll}`;
-                studentList.appendChild(li);
-            });
-        } catch (err) {
-            console.error(err.message);
-            alert('Error fetching students');
-        }
+        students.forEach((student, index) => {
+            const li = document.createElement('li');
+            li.textContent = `${index + 1}. Name -> ${student.name}, Course -> ${student.course}, Roll No. -> ${student.roll}`;
+            studentList.appendChild(li);
+        });
+    } catch (err) {
+        console.error(err.message);
+        alert(`Error fetching students: ${err.message}`);
     }
+}
 
-    // Fetch the student list on page load
-    document.addEventListener('DOMContentLoaded', fetchStudents);
+// Fetch the student list on page load
+document.addEventListener('DOMContentLoaded', fetchStudents);
